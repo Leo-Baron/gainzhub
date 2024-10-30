@@ -1,6 +1,14 @@
+// components/UserSelection.tsx
+'use client';
+
 import React from 'react';
 
-export default function Home() {
+export default function UserSelection() {
+  const handleUserSelect = (username: string) => {
+    localStorage.setItem('gainzhub-user', username);
+    window.location.reload();
+  };
+
   return (
     <main className="min-h-screen bg-[#0d1117] p-6 text-white">
       <div className="flex justify-center pt-12 pb-8">
@@ -12,20 +20,14 @@ export default function Home() {
 
       <div className="space-y-3 max-w-md mx-auto">
         <button 
-          onClick={() => {
-            localStorage.setItem('gainzhub-user', 'Léo');
-            window.location.reload();
-          }}
+          onClick={() => handleUserSelect('Léo')}
           className="w-full p-4 bg-[#1c2128] rounded-lg text-white hover:bg-[#22272e] text-left transition-colors"
         >
           Léo
         </button>
         
         <button 
-          onClick={() => {
-            localStorage.setItem('gainzhub-user', 'Nathan');
-            window.location.reload();
-          }}
+          onClick={() => handleUserSelect('Nathan')}
           className="w-full p-4 bg-[#1c2128] rounded-lg text-white hover:bg-[#22272e] text-left transition-colors"
         >
           Nathan
