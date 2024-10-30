@@ -1,6 +1,12 @@
 import { sql } from '@vercel/postgres';
+import type { ApiError } from '@/types/error';
 
-export async function initDB() {
+interface DbResult {
+  success: boolean;
+  message: string;
+}
+
+export async function initDB(): Promise<DbResult> {
   try {
     // Création de la table users
     await sql`
@@ -47,23 +53,34 @@ export async function initDB() {
       ON CONFLICT (username) DO NOTHING;
     `;
 
-    return { success: true, message: 'Base de données initialisée avec succès' };
-  } catch (error: unknown) {
-    console.error('Erreur d\'initialisation de la base de données:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-    return { success: false, message: errorMessage };
+    return { 
+      success: true, 
+      message: 'Base de données initialisée avec succès' 
+    };
+  } catch (error) {
+    const dbError = error as ApiError;
+    console.error('Erreur d\'initialisation de la base de données:', dbError);
+    return { 
+      success: false, 
+      message: dbError.message || 'Erreur inconnue lors de l\'initialisation' 
+    };
   }
 }
 
-// Fonction pour récupérer un utilisateur
-export async function getUser(username: string) {
+interface User {
+  id: number;
+  username: string;
+}
+
+export async function getUser(username: string): Promise<User | null> {
   try {
     const { rows } = await sql`
       SELECT * FROM users WHERE username = ${username}
     `;
-    return rows[0];
-  } catch (error: unknown) {
-    console.error('Erreur lors de la récupération de l\'utilisateur:', error);
-    throw error instanceof Error ? error : new Error('Erreur inconnue');
+    return rows[0] || null;
+  } catch (error) {
+    const dbError = error as ApiError;
+    console.error('Erreur lors de la récupération de l\'utilisateur:', dbError);
+    throw new Error(dbError.message || 'Erreur lors de la récupération de l\'utilisateur');
   }
 }
