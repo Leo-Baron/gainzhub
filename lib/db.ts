@@ -1,9 +1,15 @@
 import { sql } from '@vercel/postgres';
 import type { ApiError } from '@/types/error';
+import type { QueryResultRow } from '@vercel/postgres';
 
 interface DbResult {
   success: boolean;
   message: string;
+}
+
+interface User extends QueryResultRow {
+  id: number;
+  username: string;
 }
 
 export async function initDB(): Promise<DbResult> {
@@ -67,17 +73,12 @@ export async function initDB(): Promise<DbResult> {
   }
 }
 
-interface User {
-  id: number;
-  username: string;
-}
-
 export async function getUser(username: string): Promise<User | null> {
   try {
-    const { rows } = await sql`
-      SELECT * FROM users WHERE username = ${username}
+    const result = await sql<User>`
+      SELECT id, username FROM users WHERE username = ${username}
     `;
-    return rows[0] || null;
+    return result.rows[0] || null;
   } catch (error) {
     const dbError = error as ApiError;
     console.error('Erreur lors de la récupération de l\'utilisateur:', dbError);
