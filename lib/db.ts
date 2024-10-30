@@ -14,6 +14,9 @@ interface User extends QueryResultRow {
 
 export async function initDB(): Promise<DbResult> {
   try {
+    // Set client encoding to UTF-8
+    await sql`SET client_encoding = 'UTF8';`;
+
     // Création de la table users
     await sql`
       CREATE TABLE IF NOT EXISTS users (
