@@ -47,10 +47,11 @@ export async function initDB() {
       ON CONFLICT (username) DO NOTHING;
     `;
 
-    return { success: true, message: 'Database initialized successfully' };
-  } catch (error) {
-    console.error('Database initialization error:', error);
-    return { success: false, message: error.message };
+    return { success: true, message: 'Base de données initialisée avec succès' };
+  } catch (error: unknown) {
+    console.error('Erreur d\'initialisation de la base de données:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
+    return { success: false, message: errorMessage };
   }
 }
 
@@ -61,8 +62,8 @@ export async function getUser(username: string) {
       SELECT * FROM users WHERE username = ${username}
     `;
     return rows[0];
-  } catch (error) {
-    console.error('Error getting user:', error);
-    throw error;
+  } catch (error: unknown) {
+    console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+    throw error instanceof Error ? error : new Error('Erreur inconnue');
   }
 }
